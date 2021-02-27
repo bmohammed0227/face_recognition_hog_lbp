@@ -12,6 +12,7 @@ def detect_face(img_gray):
     face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
     points = face_cascade.detectMultiScale(img_gray, 1.1, 15)
     img = img_tools.gray_to_rgb(img_gray)
+    img_croped = img
 
     # Draw a rectangle around the face
     for (x, y, w, h) in points:
