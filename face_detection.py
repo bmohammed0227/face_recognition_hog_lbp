@@ -16,4 +16,6 @@ def detect_face(img_gray):
     # Draw a rectangle around the face
     for (x, y, w, h) in points:
         cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
-    return img
+        img_croped = img_gray[y:y+h, x:x+w].copy()
+            
+    return img, img_croped
