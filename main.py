@@ -1,7 +1,7 @@
 import os
 import threading
 from io import BytesIO
-import face_detection, img_tools
+import face_detection2, img_tools
 from generate_descriptor import Generate
 import pickle
 from os import walk
@@ -38,7 +38,7 @@ class MainWindow(BoxLayout):
         self.ids['captured_img'].texture = capturedImg.texture
         img = img_tools.frame_to_bgr(capturedImg.texture)
         img_gray = img_tools.bgr_to_gray(img)
-        img_result, img_croped = face_detection.detect_face(img_gray)
+        img_result, img_croped = face_detection2.detect_face(img_gray)
         self.ids['captured_img'].texture = img_tools.img_to_frame(img_result)
         # self.ids['captured_img']
 
