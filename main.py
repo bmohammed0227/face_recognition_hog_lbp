@@ -62,7 +62,7 @@ class MainWindow(BoxLayout):
         img_gray = img_tools.bgr_to_gray(img)
         img_result, img_croped = face_detection.detect_face(img_gray)
         self.ids['captured_img'].texture = img_tools.img_to_frame(img_result)
-        # self.ids['captured_img']
+        face_detection.normalize_face(img_gray)
 
         print("Captured")
         Recognition(img_croped)
@@ -89,6 +89,8 @@ class Recognition():
        
         # Read descriptors
         descriptors_directory = 'descriptors/'
+        if not os.path.isdir(descriptors_directory):
+            os.mkdir(descriptors_directory)
         _, _, descriptors_names = next(walk(descriptors_directory))
         descriptors = []
         for descriptor in descriptors_names:
