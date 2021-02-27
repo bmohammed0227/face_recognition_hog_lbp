@@ -1,0 +1,25 @@
+# :kivy 2.0.0
+
+<MainWindow>:
+    # Reserved for camera in main.py
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            id: camera
+        Button:
+            text: 'Take a picture'
+            size_hint_y: None
+            height: '48dp'
+            on_press: root.capture()            
+        ToggleButton:
+            id: toggle_button
+            text: 'Pause'
+            on_press: root.toggleCamera()
+            size_hint_y: None
+            height: '48dp'
+    BoxLayout:
+        Image:
+            id: captured_img
+            flip_vertical: True
+
+                

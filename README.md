@@ -5,3 +5,8 @@ We use a combination of hog descriptor and lbp descriptor to recognize a person.
 
 The use of both camera and local image is possible.
 
+
+# Requirements
+
+- pip install kivy[base] kivy_examples
+
