@@ -2,6 +2,9 @@ import os
 import threading
 from io import BytesIO
 
+import face_detection, img_tools
+
+
 # import cv2
 import time
 import kivy
@@ -34,6 +37,10 @@ class MainWindow(BoxLayout):
         capturedImg.texture.uvsize = (1, -1)
 
         self.ids['captured_img'].texture = capturedImg.texture
+        img = img_tools.frame_to_bgr(capturedImg.texture)
+        img_gray = img_tools.bgr_to_gray(img)
+        img_result = face_detection.detect_face(img_gray)
+        self.ids['captured_img'].texture = img_tools.img_to_frame(img_result)
         # self.ids['captured_img']
 
         print("Captured")
