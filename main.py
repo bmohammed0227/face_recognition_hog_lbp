@@ -21,9 +21,31 @@ class MainWindow(BoxLayout):
 
         # Adding camera here to avoid getting error
         # The rest of the layout will be in facereco.kv
-        self.cam = Camera(index=0)
-        self.ids['camera'].add_widget(self.cam)
+        self.cam = None
+        try:
+            self.cam = Camera(index=0)
+            self.ids['camera'].add_widget(self.cam)
+        except:
+            pass
 
+    def reload_camera(self):
+        index = 0
+        index_text = self.ids['index_spinner'].text
+        if index_text.endswith("1"):
+            index = 1
+        elif index_text.endswith("2"):
+            index = 2
+        try:
+            if self.cam is None:
+                self.cam = Camera(index=index)
+                self.ids['camera'].add_widget(self.cam)
+            else:
+                self.cam.index = index
+        except:
+            if self.cam is not None:
+                self.ids['camera'].remove_widget(self.cam)
+                self.cam = None
+        
     def capture(self):
         camera = self.cam
         timestr = time.strftime("%Y%m%d_%H%M%S")
