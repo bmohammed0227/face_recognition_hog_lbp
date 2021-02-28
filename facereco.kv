@@ -6,20 +6,44 @@
         orientation: 'vertical'
         BoxLayout:
             id: camera
-        Button:
-            text: 'Take a picture'
-            size_hint_y: None
-            height: '48dp'
-            on_press: root.capture()            
-        ToggleButton:
-            id: toggle_button
-            text: 'Pause'
-            on_press: root.toggleCamera()
-            size_hint_y: None
-            height: '48dp'
+        BoxLayout:
+            Spinner:
+                id: index_spinner
+                text: "Camera 0"
+                values: "Camera 0", "Camera 1", "Camera 2"
+                size_hint: (None, None)
+                height: '48dp'
+                on_text: root.reload_camera()
+            Button:
+                text: 'Take a picture'
+                size_hint_y: None
+                height: '48dp'
+                on_press: root.capture()            
+            ToggleButton:
+                id: toggle_button
+                text: 'Pause'
+                on_press: root.toggleCamera()
+                size_hint_y: None
+                height: '48dp'
     BoxLayout:
+        orientation: 'vertical'
         Image:
             id: captured_img
-            flip_vertical: True
+            # flip_vertical: True
+        BoxLayout:
+            Button:
+                id: save_descriptor_button
+                text: 'Save descriptor'
+                size_hint_y: None
+                height: '48dp'
+                on_press: root.save_descriptor()            
+                disabled: True
+            Button:
+                id: compare_descriptors_button
+                text: 'Compare descriptors'
+                size_hint_y: None
+                height: '48dp'
+                on_press: root.compare_descriptors()            
+                disabled: True
 
                 
