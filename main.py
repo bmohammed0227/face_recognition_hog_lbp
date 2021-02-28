@@ -2,6 +2,7 @@ import os
 import threading
 from io import BytesIO
 from face_detection import face_detection
+import img_tools
 from generate_descriptor import Generate
 import pickle
 from os import walk
