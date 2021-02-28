@@ -1,13 +1,16 @@
+import os
 import cv2
+import pickle
 import numpy as np
 from math import atan, pi
 
 class Generate :
-    def __init__(self, face_resized, w, h, window_size):
+    def __init__(self, face_resized, w=128, h=128, window_size=8, file_name=""):
         self.face_resized = face_resized
         self.w = w
         self.h = h
         self.window_size = window_size
+        self.file_name = file_name
         pass
         
     
@@ -105,7 +108,18 @@ class Generate :
         descriptor_test = []
         for i in range(0, int((w/window_size)**2)):
             descriptor_test.append((list_hist_lbp[i], list_hist_hog[i]))
-            
+        if self.file_name != "":
+            # concatenate hog & lbp
+            descriptor = []
+            # self.w replaces img_size
+            for i in range(0, int((self.w/window_size)**2)):
+                descriptor.append((list_hist_lbp[i], list_hist_hog[i]))
+
+            # serialize the descriptor to disk
+            descriptors_directory = 'descriptors/'
+            if not os.path.isdir(descriptors_directory):
+                os.mkdir(descriptors_directory)
+            with open(descriptors_directory+self.file_name, 'wb') as file:
+                pickle.dump(descriptor, file)
+
         return descriptor_test
-        
-                

@@ -1,7 +1,7 @@
 import os
 import threading
 from io import BytesIO
-import face_detection, img_tools
+from face_detection import face_detection
 from generate_descriptor import Generate
 import pickle
 from os import walk
@@ -16,6 +16,8 @@ from kivy.uix.camera import Camera
 kivy.require('2.0.0')
 
 class MainWindow(BoxLayout):
+    face_detected = None
+
     def __init__(self):
         super(MainWindow, self).__init__()
 
@@ -48,24 +50,38 @@ class MainWindow(BoxLayout):
         
     def capture(self):
         camera = self.cam
-        timestr = time.strftime("%Y%m%d_%H%M%S")
-        camera.export_to_png("IMG_{}.png".format(timestr))
+        # timestr = time.strftime("%Y%m%d_%H%M%S")
+        # camera.export_to_png("IMG_{}.png".format(timestr))
+        self.ids['captured_img'].color = [1, 1, 1, 1]
         capturedImg = self.cam.export_as_image()
-        self.ids['captured_img'].texture = capturedImg.texture
 
         # Flipping image vertically
         capturedImg.texture.uvpos = (0, 1)
         capturedImg.texture.uvsize = (1, -1)
 
-        self.ids['captured_img'].texture = capturedImg.texture
-        img = img_tools.frame_to_bgr(capturedImg.texture)
-        img_gray = img_tools.bgr_to_gray(img)
-        img_result, img_croped = face_detection.detect_face(img_gray)
-        self.ids['captured_img'].texture = img_tools.img_to_frame(img_result)
-        face_detection.normalize_face(img_gray)
+        success, img_croped, self.ids['captured_img'].texture = face_detection(capturedImg.texture)
+        if success is True:
+            self.face_detected = img_croped
+            self.ids['save_descriptor_button'].disabled = False
+            self.ids['compare_descriptors_button'].disabled = False
+        else:
+            self.ids['save_descriptor_button'].disabled = True
+            self.ids['compare_descriptors_button'].disabled = True
+            self.face_detected = None
+            
+    def save_descriptor(self):
+        w = h = 128 # size of the face (128*128)
+        face_resized = cv2.resize(self.face_detected, (w, h))
+        Generate(face_resized, file_name="my_descriptor").generate()
 
-        print("Captured")
-        Recognition(img_croped)
+    def compare_descriptors(self):
+        result = Recognition(self.face_detected).recognize()
+        if result is True:
+            self.ids['captured_img'].color = [0, 1, 0, 1]
+            print("YES")
+        else:
+            self.ids['captured_img'].color = [1, 0, 0, 1]
+            print("NO")
 
     def toggleCamera(self):
         if self.cam.play is True:
@@ -78,11 +94,13 @@ class MainWindow(BoxLayout):
             
 class Recognition():
     def __init__(self, face_croped):
+        self.face_croped = face_croped
                 
+    def recognize(self):
         # Normalize the face
         w = h = 128 # size of the face (128*128)
         window_size = 8 # size of the hog & lbp blocks
-        face_resized = cv2.resize(face_croped, (w, h))
+        face_resized = cv2.resize(self.face_croped, (w, h))
         
         # Generate descriptor
         descriptor_test = Generate(face_resized, w, h, window_size).generate()
@@ -111,10 +129,7 @@ class Recognition():
             print(mse)
             if(mse<700):
                 is_authorized = True
-        if is_authorized:
-            print("YES")
-        else:
-            print("NO")
+        return is_authorized
 
 
 class FaceRecoApp(App):

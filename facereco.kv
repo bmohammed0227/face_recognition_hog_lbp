@@ -26,8 +26,24 @@
                 size_hint_y: None
                 height: '48dp'
     BoxLayout:
+        orientation: 'vertical'
         Image:
             id: captured_img
-            flip_vertical: True
+            # flip_vertical: True
+        BoxLayout:
+            Button:
+                id: save_descriptor_button
+                text: 'Save descriptor'
+                size_hint_y: None
+                height: '48dp'
+                on_press: root.save_descriptor()            
+                disabled: True
+            Button:
+                id: compare_descriptors_button
+                text: 'Compare descriptors'
+                size_hint_y: None
+                height: '48dp'
+                on_press: root.compare_descriptors()            
+                disabled: True
 
                 
