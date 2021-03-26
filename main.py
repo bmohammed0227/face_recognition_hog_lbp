@@ -15,9 +15,12 @@ from kivy.uix.camera import Camera
 
 kivy.require('2.0.0')
 
+MSE_CONST = 700
+
 class MainWindow(BoxLayout):
     face_detected = None
     detection_method = 1
+    captured_image = ""
 
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -79,7 +82,8 @@ class MainWindow(BoxLayout):
     def save_descriptor(self):
         w = h = 128 # size of the face (128*128)
         face_resized = cv2.resize(self.face_detected, (w, h))
-        Generate(face_resized, file_name="my_descriptor").generate()
+        timestr = time.strftime("%Y%m%d_%H%M%S")
+        Generate(face_resized, file_name="my_descriptor_{}".format(timestr)).generate()
 
     def compare_descriptors(self):
         result = Recognition(self.face_detected).recognize()
@@ -134,7 +138,7 @@ class Recognition():
                 mse_hog.append(((descriptor[j][1]-descriptor_test[j][1])**2).mean())
                 mse += mse_lbp[j] + mse_hog[j]
             print(mse)
-            if(mse<700):
+            if(mse<MSE_CONST):
                 is_authorized = True
         return is_authorized
 

@@ -48,6 +48,8 @@ def detect_face2(img_gray):
     # Detect the face
     locations = face_recognition.face_locations(img_gray, model="cnn")
 
+    global img_croped, success
+
     # convert image to rgb
     img = img_tools.gray_to_rgb(img_gray)
 
