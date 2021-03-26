@@ -5,6 +5,7 @@ import numpy as np
 from math import atan, pi
 import pickle
 from kivy.graphics.texture import Texture
+import face_recognition
 
 import img_tools
 
@@ -42,6 +43,32 @@ def detect_face(img_gray):
 
     return img, img_croped
 
+
+def detect_face2(img_gray):
+    # Detect the face
+    locations = face_recognition.face_locations(img_gray, model="cnn")
+
+    global img_croped, success
+
+    # convert image to rgb
+    img = img_tools.gray_to_rgb(img_gray)
+
+    img_croped = img
+
+    print(locations)
+    # Draw a rectangle around the face
+    for (y1, x2, y2, x1) in locations:
+        cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+
+        # crop image
+        img_croped = img_gray[y1:y2, x1:x2].copy()
+
+    if len(locations) != 0:
+        success = True
+    else:
+        success = False
+
+    return img, img_croped
 
 def normalize_face(img_gray):
     # normalize the face
@@ -161,10 +188,13 @@ def hog_face():
 
 
 
-def face_detection(frame):
+def face_detection(frame, detection_method):
     img = img_tools.frame_to_bgr(frame)
     img_gray = img_tools.bgr_to_gray(img)
-    img_result, img_croped = detect_face(img_gray)
+    if detection_method == 1:
+        img_result, img_croped = detect_face(img_gray)
+    elif detection_method == 2:
+        img_result, img_croped = detect_face2(img_gray)
     # normalized_img = normalize_face(img_gray)
     # lbp_img = lbp_face()
     # hog_face()

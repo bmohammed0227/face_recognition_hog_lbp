@@ -2,7 +2,6 @@ import os
 import threading
 from io import BytesIO
 from face_detection import face_detection
-import img_tools
 from generate_descriptor import Generate
 import pickle
 from os import walk
@@ -16,8 +15,12 @@ from kivy.uix.camera import Camera
 
 kivy.require('2.0.0')
 
+MSE_CONST = 700
+
 class MainWindow(BoxLayout):
     face_detected = None
+    detection_method = 1
+    captured_image = ""
 
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -30,6 +33,12 @@ class MainWindow(BoxLayout):
             self.ids['camera'].add_widget(self.cam)
         except:
             pass
+
+    def change_face_detection(self):
+        if self.ids['detection_method_spinner'].text == "Haar Cascade":
+            self.detection_method = 1
+        else:
+            self.detection_method = 2
 
     def reload_camera(self):
         index = 0
@@ -60,7 +69,7 @@ class MainWindow(BoxLayout):
         capturedImg.texture.uvpos = (0, 1)
         capturedImg.texture.uvsize = (1, -1)
 
-        success, img_croped, self.ids['captured_img'].texture = face_detection(capturedImg.texture)
+        success, img_croped, self.ids['captured_img'].texture = face_detection(capturedImg.texture, self.detection_method)
         if success is True:
             self.face_detected = img_croped
             self.ids['save_descriptor_button'].disabled = False
@@ -73,7 +82,8 @@ class MainWindow(BoxLayout):
     def save_descriptor(self):
         w = h = 128 # size of the face (128*128)
         face_resized = cv2.resize(self.face_detected, (w, h))
-        Generate(face_resized, file_name="my_descriptor").generate()
+        timestr = time.strftime("%Y%m%d_%H%M%S")
+        Generate(face_resized, file_name="my_descriptor_{}".format(timestr)).generate()
 
     def compare_descriptors(self):
         result = Recognition(self.face_detected).recognize()
@@ -128,7 +138,7 @@ class Recognition():
                 mse_hog.append(((descriptor[j][1]-descriptor_test[j][1])**2).mean())
                 mse += mse_lbp[j] + mse_hog[j]
             print(mse)
-            if(mse<700):
+            if(mse<MSE_CONST):
                 is_authorized = True
         return is_authorized
 
