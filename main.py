@@ -2,7 +2,6 @@ import os
 import threading
 from io import BytesIO
 from face_detection import face_detection
-import img_tools
 from generate_descriptor import Generate
 import pickle
 from os import walk
@@ -18,6 +17,7 @@ kivy.require('2.0.0')
 
 class MainWindow(BoxLayout):
     face_detected = None
+    detection_method = 1
 
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -30,6 +30,12 @@ class MainWindow(BoxLayout):
             self.ids['camera'].add_widget(self.cam)
         except:
             pass
+
+    def change_face_detection(self):
+        if self.ids['detection_method_spinner'].text == "Haar Cascade":
+            self.detection_method = 1
+        else:
+            self.detection_method = 2
 
     def reload_camera(self):
         index = 0
@@ -60,7 +66,7 @@ class MainWindow(BoxLayout):
         capturedImg.texture.uvpos = (0, 1)
         capturedImg.texture.uvsize = (1, -1)
 
-        success, img_croped, self.ids['captured_img'].texture = face_detection(capturedImg.texture)
+        success, img_croped, self.ids['captured_img'].texture = face_detection(capturedImg.texture, self.detection_method)
         if success is True:
             self.face_detected = img_croped
             self.ids['save_descriptor_button'].disabled = False

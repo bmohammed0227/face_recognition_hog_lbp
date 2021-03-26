@@ -45,5 +45,12 @@
                 height: '48dp'
                 on_press: root.compare_descriptors()            
                 disabled: True
+            Spinner:
+                id: detection_method_spinner
+                text: "Haar Cascade"
+                values: "Haar Cascade", "CNN"
+                size_hint: (None, None)
+                height: '48dp'
+                on_text: root.change_face_detection()
 
                 
